@@ -10,6 +10,7 @@ import { errorHandler } from "./middlewears/error-handler";
 import { NotFoundError } from "./errors/not-found-error";
 import mongoose from "mongoose";
 import cookieSession from "cookie-session";
+import { DatabaseConnectionError } from "./errors/database-connection-error";
 
 const app = express();
 app.set("trust proxy", true);
@@ -42,6 +43,7 @@ const start = async () => {
     await mongoose.connect("mongodb://auth-mongo-srv:27017/auth", {});
     console.log("Connected to MongoDb");
   } catch (err) {
+    throw new DatabaseConnectionError();
     console.error(err);
   }
 
