@@ -1,0 +1,23 @@
+apiVersion: skaffold/v2alpha3
+kind: Config
+deploy:
+  kubectl:
+    manifests:
+      - ./infra/k8s/*
+build:
+
+  
+  artifacts:
+    - image: eshanmaduranga/auth2
+      context: auth
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - src: "src/**/*.ts"
+            dest: .
+      
+
+# Skaffold is a command-line tool that facilitates continuous development on Kubernetes clusters. 
+#It automates the workflow for building, pushing, and deploying your application, allowing for rapid iteration during development. 
+#Skaffold handles the complexities of Kubernetes deployment, making it easier to develop, test, and deploy applications in a Kubernetes environment.
