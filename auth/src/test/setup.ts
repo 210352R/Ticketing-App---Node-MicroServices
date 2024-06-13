@@ -1,13 +1,16 @@
-import { MongoMemoryServer } from "mongodb-memory-server";
+// tests/setup.ts
+
+import { MongoMemoryServer } from "mongodb-memory-server-core"; // Use mongodb-memory-server-core
 import mongoose from "mongoose";
-import supertest from "supertest";
+
 import { app } from "../app";
 
 let mongo: any;
 
 beforeAll(async () => {
-  mongo = new MongoMemoryServer();
-  const mongoUri = await mongo.getUri();
+  process.env.JWT_KEY = "asdfasdf"; // Ensure you have a JWT key set up
+  mongo = await MongoMemoryServer.create(); // This creates and starts the server
+  const mongoUri = mongo.getUri(); // Get the URI after the server is started
 
   await mongoose.connect(mongoUri, {});
 });
