@@ -1,16 +1,23 @@
-// tests/setup.ts
-
-import { MongoMemoryServer } from "mongodb-memory-server-core"; // Use mongodb-memory-server-core
+import { MongoMemoryServer } from "mongodb-memory-server";
 import mongoose from "mongoose";
-
+import request from "supertest";
 import { app } from "../app";
 
-let mongo: any;
+declare global {
+  namespace NodeJS {
+    interface Global {
+      signin(): Promise<string[]>;
+    }
+  }
+}
 
+let mongo: any;
 beforeAll(async () => {
-  process.env.JWT_KEY = "asdfasdf"; // Ensure you have a JWT key set up
-  mongo = await MongoMemoryServer.create(); // This creates and starts the server
-  const mongoUri = mongo.getUri(); // Get the URI after the server is started
+  process.env.JWT_KEY = "asdfasdf";
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+
+  mongo = await MongoMemoryServer.create();
+  const mongoUri = mongo.getUri();
 
   await mongoose.connect(mongoUri, {});
 });
@@ -27,3 +34,20 @@ afterAll(async () => {
   await mongo.stop();
   await mongoose.connection.close();
 });
+
+export const signin = async () => {
+  const email = "test@test.com";
+  const password = "password";
+
+  const response = await request(app)
+    .post("/api/users/signup")
+    .send({
+      email,
+      password,
+    })
+    .expect(201);
+
+  const cookie = response.get("Set-Cookie");
+
+  return cookie;
+};
